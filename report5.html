@@ -727,24 +727,24 @@ document.getElementById('themeBtn').addEventListener('click',()=>{
 // ══════════════════ EXPORT ══════════════════
 // Build detail rows for all tracks in list — used in both single and bulk export
 function buildDetailSheet(rows) {
-  const out=[['Квартал','Артист','Трек','Площадка','Территория','Вид исп.','Прослуш.','Сумма лиц.','Вознагр.','% Вычет','После вычета','Правка']];
+  const out=[['Квартал','Артист','Трек','Площадка','Территория','Вид исп.','Прослуш.','Сумма лиц.','Вознагр.','% Вычет','После вычета']];
   rows.forEach(r=>{
     const s=getTS(r);
     r.details.forEach((d,i)=>{
       const e=s.detEdits[i];
       const rnet=e!==null?e:d[5]*(1-s.pct/100);
-      out.push([r.quarter,r.artist,r.track,d[0],d[1],d[2],d[3],+d[4].toFixed(4),+d[5].toFixed(4),s.pct,+rnet.toFixed(4),e!==null?e:'']);
+      out.push([r.quarter,r.artist,r.track,d[0],d[1],d[2],d[3],+d[4].toFixed(4),+d[5].toFixed(4),s.pct,+rnet.toFixed(4)]);
     });
   });
   return out;
 }
 function buildSummarySheet(rows) {
   return [
-    ['Квартал','Артист','Трек','Альбом','Правообладатель','Прослушиваний','Доход (₽)','% Вычет','Ручная сумма','Итого (₽)','Строк'],
+    ['Квартал','Артист','Трек','Альбом','Правообладатель','Прослушиваний','Доход (₽)','% Вычет','Итого (₽)','Строк'],
     ...rows.map(r=>{
       const s=getTS(r); const net=computeNet(r);
       return[r.quarter,r.artist,r.track,r.album,r.label,r.total_plays,
-        +r.total_reward.toFixed(4),s.pct,s.rowOverride??'',+net.toFixed(4),r.row_count];
+        +r.total_reward.toFixed(4),s.pct,+net.toFixed(4),r.row_count];
     })
   ];
 }
@@ -761,10 +761,10 @@ document.getElementById('exportBtn').addEventListener('click',()=>{
 
   const wb=XLSX.utils.book_new();
   const ws1=XLSX.utils.aoa_to_sheet(buildSummarySheet(filtered));
-  ws1['!cols']=[12,18,22,18,14,12,14,8,14,14,8].map(w=>({wch:w}));
+  ws1['!cols']=[12,18,22,18,14,12,14,8,14,8].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb,ws1,'Сводная');
   const ws2=XLSX.utils.aoa_to_sheet(buildDetailSheet(filtered));
-  ws2['!cols']=[12,18,22,14,14,16,10,12,12,8,12,12].map(w=>({wch:w}));
+  ws2['!cols']=[12,18,22,14,14,16,10,12,12,8,12].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb,ws2,'Детализация');
   XLSX.writeFile(wb,fname);
 });
@@ -779,20 +779,20 @@ function exportSingle(row) {
 
   // Sheet 1: full detail breakdown (this is what the user wants to see per-track)
   const detRows=[['#','Площадка','Территория','Вид использования','Прослушиваний',
-    'Сумма лицензиата (₽)','Вознаграждение (₽)','% Вычет','После вычета (₽)','Ручная правка']];
+    'Сумма лицензиата (₽)','Вознаграждение (₽)','% Вычет','После вычета (₽)']];
   row.details.forEach((d,i)=>{
     const e=s.detEdits[i];
     const rnet=e!==null?e:d[5]*(1-s.pct/100);
-    detRows.push([i+1,d[0],d[1],d[2],d[3],+d[4].toFixed(4),+d[5].toFixed(4),s.pct,+rnet.toFixed(4),e!==null?e:'']);
+    detRows.push([i+1,d[0],d[1],d[2],d[3],+d[4].toFixed(4),+d[5].toFixed(4),s.pct,+rnet.toFixed(4)]);
   });
   // Totals row
   const totalPlays=row.details.reduce((a,d)=>a+d[3],0);
   const totalAmt=row.details.reduce((a,d)=>a+d[4],0);
   const totalRew=row.details.reduce((a,d)=>a+d[5],0);
-  detRows.push(['ИТОГО','','','',totalPlays,+totalAmt.toFixed(4),+totalRew.toFixed(4),'',+net.toFixed(4),'']);
+  detRows.push(['ИТОГО','','','',totalPlays,+totalAmt.toFixed(4),+totalRew.toFixed(4),'',+net.toFixed(4)]);
   const sheetName=safeName.substring(0,25)+' — Детализация';
   const ws1=XLSX.utils.aoa_to_sheet(detRows);
-  ws1['!cols']=[4,18,14,18,10,16,16,8,16,14].map(w=>({wch:w}));
+  ws1['!cols']=[4,18,14,18,10,16,16,8,16].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb,ws1,sheetName);
 
   // Sheet 2: summary card
@@ -803,7 +803,6 @@ function exportSingle(row) {
     ['Прослушиваний',row.total_plays],
     ['Исходный доход (₽)',+row.total_reward.toFixed(4)],
     ['% Вычет',s.pct],
-    ['Ручная сумма',s.rowOverride??'не задана'],
     ['Итого (₽)',+net.toFixed(4)],
     ['Строк данных',row.row_count],
   ];
