@@ -1,14 +1,35 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "rewrites": [
+  "builds": [
     {
-      "source": "/favicon.ico",
-      "destination": "/favicon.svg"
+      "src": "report5.html",
+      "use": "@vercel/static"
     },
     {
-      "source": "/favicon.png",
-      "destination": "/favicon.svg"
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "favicon.svg",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/$",
+      "dest": "/report5.html"
+    },
+    {
+      "src": "^/favicon\\.ico$",
+      "dest": "/favicon.svg"
+    },
+    {
+      "src": "^/favicon\\.png$",
+      "dest": "/favicon.svg"
+    },
+    {
+      "handle": "filesystem"
     }
   ]
 }
