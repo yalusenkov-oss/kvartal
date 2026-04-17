@@ -1,0 +1,9 @@
+{
+  "name": "kvartal-report5",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local launcher for the PFVMUSIC report project",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
